@@ -1,0 +1,13 @@
+autorag
+marker-pdf
+pymupdf
+streamlit
+streamlit-option-menu
+streamlit-extras
+pandas
+ollama
+requests
+pillow
+tqdm
+pyarrow
+fastparquet
