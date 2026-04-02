@@ -13,6 +13,7 @@ import time
 import re
 import psutil
 import platform
+import sys
 
 # Config
 RAW_DIR = "data/raw"
@@ -322,8 +323,9 @@ elif selected == "System Settings":
     # 2. Ollama Model Management
     st.subheader("🤖 Ollama Model Explorer")
     try:
-        # Get models
-        models_data = ollama.list()
+        # Get models with explicit local host
+        client = ollama.Client(host='http://127.0.0.1:11434')
+        models_data = client.list()
         # The structure of ollama.list() can vary by version, handling carefully
         models = models_data.get('models', [])
         if models:
