@@ -53,3 +53,9 @@ desktop.ini
 .idea/
 *.swp
 *.swo
+
+# Documentation/Planning Files
+implementation_plan.md
+plan.md
+research.md
+UIX.md
