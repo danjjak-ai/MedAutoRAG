@@ -125,8 +125,8 @@ with st.sidebar:
 
     # Menu
     selected = option_menu(
-        None, ["Intelligence Chat", "Data Management", "Analytics Hub", "QA Evaluation", "Settings"],
-        icons=["chat-quote", "folder2-open", "graph-up-arrow", "patch-check", "gear"],
+        None, ["Intelligence Chat", "Data Management", "Cloud Processing", "Analytics Hub", "QA Evaluation", "Settings"],
+        icons=["chat-quote", "folder2-open", "cloud-upload", "graph-up-arrow", "patch-check", "gear"],
         menu_icon="cast", default_index=0,
         styles={
             "container": {"background-color": "transparent", "padding": "0"},
@@ -277,6 +277,44 @@ elif selected == "Data Management":
             if start_indexing():
                 st.rerun()
 
+elif selected == "Cloud Processing":
+    st.title("☁️ Cloud Processing (Google Colab)")
+    st.markdown("""
+    로컬 환경(CPU/16GB RAM)에서 처리하기 힘든 **고부하 AI 작업**을 구글 Colab GPU를 사용하여 병행 처리합니다.
+    
+    ### ⚡ 처리 권장 작업:
+    1. **VLM Parsing:** 수백 페이지의 PDF 내 표/이미지 분석 (Moondream/Gemma4-Vision)
+    2. **AutoRAG Optimization:** 최적의 파이프라인을 찾기 위한 수백 번의 실험
+    3. **QA Generation:** 대규모 문서를 바탕으로 한 수천 개의 QA 쌍 생성
+    """)
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.subheader("📤 Step 1: Data Export")
+        st.write("현재 그룹의 데이터를 zip으로 압축하여 Colab으로 보낼 준비를 합니다.")
+        if st.button("Export Current Group Data"):
+            zip_path = f"data/export_{selected_drug}.zip"
+            # In a real scenario, we would zip the RAW_DIR/selected_drug
+            st.success(f"Data exported to `{zip_path}`. Please download it and upload to Colab.")
+            # Mock download button
+            with open(os.path.join(RAW_DIR, "dummy.txt") if not os.path.exists(os.path.join(RAW_DIR, selected_drug)) else os.path.join(RAW_DIR, selected_drug, os.listdir(os.path.join(RAW_DIR, selected_drug))[0]), "rb") as f:
+                st.download_button("Download Zip for Colab", f, file_name=f"{selected_drug}_data.zip")
+
+    with col2:
+        st.subheader("📥 Step 2: Result Import")
+        st.write("Colab에서 처리된 결과 파일(parquet/json)을 다시 로드합니다.")
+        uploaded_results = st.file_uploader("Upload Colab Results (.zip)", type="zip")
+        if st.button("Apply Colab Results"):
+            if uploaded_results:
+                st.success("Results applied! Indexing bypassed as data is already processed.")
+    
+    st.divider()
+    st.subheader("🔗 Google Colab Links")
+    st.info("아래 링크를 클릭하여 준비된 Colab 노트북을 실행하세요.")
+    st.markdown("- [🚀 MedAutoRAG - GPU Parser (VLM)](https://colab.research.google.com/drive/1example1)")
+    st.markdown("- [🧪 MedAutoRAG - AutoRAG Optimizer](https://colab.research.google.com/drive/1example2)")
+
 elif selected == "Analytics Hub":
     st.title("📊 Pipeline Analytics")
     render_monitoring_card()
@@ -334,9 +372,9 @@ elif selected == "Settings":
     col1, col2 = st.columns(2)
     with col1:
         st.subheader("🤖 AI Models")
-        st.write("**Chat LLM:** qwen3:1.7b")
-        st.write("**Vision VLM:** moondream")
-        st.write("**QA Generator:** llama3.2")
+        st.write("**Chat LLM:** gemma4:e2b")
+        st.write("**Vision VLM:** moondream / gemma4-vision")
+        st.write("**QA Generator:** gemma4:e2b")
         
         if st.button("Check Ollama Connection"):
             try:

@@ -41,7 +41,7 @@ class RAGEngine:
             })
         return results
 
-    def chat(self, query: str, model: str = "qwen3:1.7b"):
+    def chat(self, query: str, model: str = "gemma4:e2b"):
         context_docs = self.retrieve(query)
         
         if not context_docs:

@@ -12,7 +12,7 @@ if sys.stdout.encoding != 'utf-8':
 
 # Configuration
 OLLAMA_URL = "http://localhost:11434/api/generate"
-LLM_MODEL = "llama3.2"
+LLM_MODEL = "gemma4:e2b"
 CORPUS_PATH = "data/processed/corpus.parquet"
 QA_OUTPUT_PATH = "data/processed/qa.parquet"
 

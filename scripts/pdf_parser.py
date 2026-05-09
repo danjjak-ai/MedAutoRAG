@@ -15,7 +15,7 @@ if sys.stdout.encoding != 'utf-8':
 
 # Ollama API Config
 OLLAMA_URL = "http://localhost:11434/api/generate"
-VLM_MODEL = "moondream"
+VLM_MODEL = "gemma4"
 
 def describe_image(image_bytes: bytes) -> str:
     """Send image to Ollama VLM for description."""
