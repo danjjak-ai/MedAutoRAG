@@ -14,6 +14,22 @@ MedAutoRAG is a high-performance local medical knowledge base and RAG (Retrieval
 - **Real-time Monitoring**: Premium UI with indexing progress, system resource status (CPU/RAM), and model information.
 - **16GB RAM Optimized**: Designed to run smoothly even in non-GPU environments using efficient memory management.
 
+## 📸 UI Gallery
+
+````carousel
+![Intelligence Chat](assets/screenshots/chat.png)
+<!-- slide -->
+![Data Management](assets/screenshots/data.png)
+<!-- slide -->
+![Cloud Processing](assets/screenshots/cloud.png)
+<!-- slide -->
+![Analytics Hub](assets/screenshots/analytics.png)
+<!-- slide -->
+![QA Evaluation](assets/screenshots/qa.png)
+<!-- slide -->
+![Settings](assets/screenshots/settings.png)
+````
+
 ## 🛠️ Tech Stack
 
 - **UI**: Streamlit (Premium Custom CSS)
