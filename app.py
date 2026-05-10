@@ -138,6 +138,17 @@ with st.sidebar:
     
     st.spacer = st.empty()
     st.sidebar.markdown("---")
+    # Model Selection
+    st.subheader("🤖 Active Model")
+    try:
+        model_list_res = ollama.list()
+        available_models = [m['name'] for m in model_list_res['models']]
+    except:
+        available_models = ["gemma4:latest", "llama3.2:latest"]
+    
+    selected_model = st.selectbox("채팅 모델 선택", available_models, index=0 if "gemma4:latest" in available_models else 0)
+    
+    st.sidebar.markdown("---")
     # RAM Monitor
     ram = psutil.virtual_memory()
     st.sidebar.caption(f"RAM Usage: {ram.percent}% ({round(ram.used/(1024**3), 1)}G / {round(ram.total/(1024**3), 1)}G)")
@@ -223,8 +234,8 @@ if selected == "Intelligence Chat":
             st.markdown(prompt)
 
         with st.chat_message("assistant"):
-            with st.spinner("전문 지식 베이스 검색 및 분석 중..."):
-                answer, sources = rag.chat(prompt)
+            with st.spinner(f"전문 지식 베이스 검색 및 {selected_model} 분석 중..."):
+                answer, sources = rag.chat(prompt, model=selected_model)
                 
                 # Format answer with source highlights
                 source_html = ""
@@ -418,9 +429,9 @@ elif selected == "Settings":
     col1, col2 = st.columns(2)
     with col1:
         st.subheader("🤖 AI Models")
-        st.write("**Chat LLM:** gemma4:e2b")
+        st.write(f"**Chat LLM:** {selected_model}")
         st.write("**Vision VLM:** moondream / gemma4-vision")
-        st.write("**QA Generator:** gemma4:e2b")
+        st.write(f"**QA Generator:** {selected_model}")
         
         if st.button("Check Ollama Connection"):
             try:
