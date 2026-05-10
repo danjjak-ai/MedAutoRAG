@@ -242,11 +242,36 @@ if selected == "Intelligence Chat":
                 if sources:
                     source_html = "<div class='source-box'><b>Reference Sources:</b><br>"
                     for s in sources:
-                        source_html += f"• {s['source']} (p.{s['page']})<br>"
+                        # Construct file path
+                        file_path = os.path.join(RAW_DIR, selected_drug, s['source'])
+                        
+                        # Generate Base64 Link for browser viewing
+                        try:
+                            with open(file_path, "rb") as f:
+                                base64_pdf = base64.b64encode(f.read()).decode('utf-8')
+                            pdf_link = f'<a href="data:application/pdf;base64,{base64_pdf}#page={s["page"]}" target="_blank" style="color: #3b82f6; text-decoration: none; font-weight: 600;">{s["source"]} (p.{s["page"]})</a>'
+                        except:
+                            pdf_link = f"{s['source']} (p.{s['page']})"
+
+                        source_html += f"• {pdf_link}<br>"
                     source_html += "</div>"
                 
                 full_response = answer + "\n\n" + source_html
                 st.markdown(full_response, unsafe_allow_html=True)
+                
+                # Show action buttons for sources
+                if sources:
+                    cols = st.columns(len(sources))
+                    for i, s in enumerate(sources):
+                        file_path = os.path.abspath(os.path.join(RAW_DIR, selected_drug, s['source']))
+                        if cols[i].button(f"📖 Open {s['source'][:15]}... p.{s['page']}", key=f"src_{i}_{time.time()}"):
+                            try:
+                                # Windows specific command to open file at specific page (if supported by default viewer)
+                                os.startfile(file_path)
+                                st.toast(f"Opening {s['source']}...")
+                            except Exception as e:
+                                st.error(f"Failed to open file: {e}")
+
                 st.session_state.messages.append({"role": "assistant", "content": full_response})
 
 elif selected == "Data Management":
