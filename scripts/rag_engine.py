@@ -5,8 +5,10 @@ import ollama
 import re
 
 class RAGEngine:
-    def __init__(self, drug_name: str, processed_dir: str = "data/processed"):
+    def __init__(self, drug_name: str, processed_dir: str = "data/processed", host: str = "http://127.0.0.1:11434"):
         self.drug_name = drug_name
+        self.processed_dir = processed_dir
+        self.host = host
         self.corpus_path = os.path.join(processed_dir, drug_name, "corpus.parquet")
         self.df = None
         self.bm25 = None
@@ -60,7 +62,7 @@ Context:
 """
         
         try:
-            client = ollama.Client(host='http://127.0.0.1:11434')
+            client = ollama.Client(host=self.host)
             response = client.chat(model=model, messages=[
                 {'role': 'system', 'content': system_prompt},
                 {'role': 'user', 'content': query},

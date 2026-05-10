@@ -14,6 +14,7 @@ import re
 import psutil
 import platform
 import sys
+import urllib.parse
 from scripts.rag_engine import RAGEngine
 
 # Config
@@ -43,68 +44,97 @@ st.set_page_config(
 st.markdown("""
 <style>
     /* Google Fonts Import */
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Inter:wght@300;400;600&display=swap');
     
     html, body, [class*="css"] {
-        font-family: 'Inter', sans-serif;
+        font-family: 'Outfit', 'Inter', sans-serif;
     }
 
     .stApp {
-        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        background: radial-gradient(circle at top right, #f8fafc, #eff6ff);
         color: #1e293b;
     }
     
     /* Elegant Sidebar */
     section[data-testid="stSidebar"] {
-        background-color: #ffffff !important;
-        border-right: 1px solid #e2e8f0;
-        box-shadow: 4px 0 10px rgba(0,0,0,0.02);
+        background: rgba(255, 255, 255, 0.9) !important;
+        backdrop-filter: blur(10px);
+        border-right: 1px solid rgba(226, 232, 240, 0.5);
     }
     
     /* High Visibility Professional Buttons */
     div[data-testid="stButton"] button {
-        background: linear-gradient(90deg, #0f172a, #1e293b) !important;
+        background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
         color: #ffffff !important;
         border: none !important;
-        border-radius: 8px !important;
-        padding: 0.6rem 1.2rem !important;
+        border-radius: 10px !important;
+        padding: 0.7rem 1.5rem !important;
         font-weight: 600 !important;
-        transition: all 0.3s ease;
-        width: 100%;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
     }
     div[data-testid="stButton"] button:hover {
-        background: #334155 !important;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+        transform: translateY(-3px) scale(1.02);
+        box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3) !important;
+        background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
     }
     
     /* Metrics Styling */
+    div[data-testid="metric-container"] {
+        background: white;
+        padding: 15px;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    }
     div[data-testid="stMetricValue"] {
-        color: #2563eb !important;
-        font-weight: 700 !important;
+        color: #1d4ed8 !important;
+        font-weight: 800 !important;
+        font-size: 1.8rem !important;
     }
 
-    /* Cards / Chat Messages */
+    /* Chat Messages */
     .stChatMessage {
-        background: #ffffff !important;
-        border: 1px solid #e2e8f0 !important;
-        border-radius: 12px !important;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.02) !important;
-        margin-bottom: 1rem !important;
+        background: rgba(255, 255, 255, 0.8) !important;
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(226, 232, 240, 0.8) !important;
+        border-radius: 20px !important;
+        padding: 1.5rem !important;
+        box-shadow: 0 10px 15px -3px rgba(0,0,0,0.03) !important;
     }
     
     .source-box {
-        background: #f8fafc;
-        border-left: 4px solid #3b82f6;
-        padding: 10px;
-        margin: 5px 0;
-        font-size: 0.85rem;
+        background: linear-gradient(to right, #f1f5f9, #ffffff);
+        border-left: 5px solid #3b82f6;
+        padding: 15px;
+        margin: 15px 0;
+        font-size: 0.9rem;
+        border-radius: 8px;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+    }
+    
+    .source-link {
+        color: #2563eb;
+        text-decoration: none;
+        font-weight: 600;
+        padding: 2px 6px;
         border-radius: 4px;
+        transition: all 0.2s;
+    }
+    .source-link:hover {
+        background: #dbeafe;
+        color: #1e40af;
     }
 
-    /* Status Indicators */
-    .status-active { color: #10b981; font-weight: bold; }
-    .status-idle { color: #94a3b8; }
+    /* Custom Header */
+    .main-header {
+        font-size: 2.5rem;
+        font-weight: 800;
+        background: linear-gradient(90deg, #1e293b, #3b82f6);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 0.5rem;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -141,7 +171,8 @@ with st.sidebar:
     # Model Selection
     st.subheader("🤖 Active Model")
     try:
-        model_list_res = ollama.list()
+        client = ollama.Client(host=st.session_state.ollama_host)
+        model_list_res = client.list()
         available_models = [m['name'] for m in model_list_res['models']]
     except:
         available_models = ["gemma4:latest", "llama3.2:latest"]
@@ -160,6 +191,8 @@ if "is_indexing" not in st.session_state:
     st.session_state.is_indexing = False
 if "current_drug" not in st.session_state:
     st.session_state.current_drug = selected_drug
+if "ollama_host" not in st.session_state:
+    st.session_state.ollama_host = "http://127.0.0.1:11434"
 
 # Reset chat if drug changed
 if st.session_state.current_drug != selected_drug:
@@ -211,15 +244,16 @@ def render_monitoring_card():
 
 # --- Page Logic ---
 if selected == "Intelligence Chat":
-    st.markdown(f"### 🧬 AI Medical Intelligence - <span style='color:#1d4ed8'>{selected_drug}</span>", unsafe_allow_html=True)
+    st.markdown(f"<h1 class='main-header'>🧬 AI Medical Intelligence</h1>", unsafe_allow_html=True)
+    st.markdown(f"<p style='color:#64748b; font-size: 1.1rem; margin-top: -10px;'>Knowledge Base: <b>{selected_drug}</b></p>", unsafe_allow_html=True)
     render_monitoring_card()
     
     # Init RAG Engine
     @st.cache_resource
-    def load_rag(drug):
-        return RAGEngine(drug)
+    def load_rag(drug, host):
+        return RAGEngine(drug, host=host)
     
-    rag = load_rag(selected_drug)
+    rag = load_rag(selected_drug, st.session_state.ollama_host)
     
     # Chat display
     chat_container = st.container()
@@ -243,16 +277,26 @@ if selected == "Intelligence Chat":
                     source_html = "<div class='source-box'><b>Reference Sources:</b><br>"
                     for s in sources:
                         # Construct file path
-                        file_path = os.path.join(RAW_DIR, selected_drug, s['source'])
+                        src_path = os.path.join(RAW_DIR, selected_drug, s['source'])
+                        static_dir = os.path.join("static", selected_drug)
+                        os.makedirs(static_dir, exist_ok=True)
+                        static_path = os.path.join(static_dir, s['source'])
                         
-                        # Generate Base64 Link for browser viewing
-                        try:
-                            with open(file_path, "rb") as f:
-                                base64_pdf = base64.b64encode(f.read()).decode('utf-8')
-                            pdf_link = f'<a href="data:application/pdf;base64,{base64_pdf}#page={s["page"]}" target="_blank" style="color: #3b82f6; text-decoration: none; font-weight: 600;">{s["source"]} (p.{s["page"]})</a>'
-                        except:
-                            pdf_link = f"{s['source']} (p.{s['page']})"
-
+                        # Copy to static folder if not exists (for URL access)
+                        if not os.path.exists(static_path):
+                            try:
+                                shutil.copy2(src_path, static_path)
+                            except:
+                                pass
+                        
+                        # Generate Clean URL Link
+                        # Streamlit serves files from 'static' folder at '/app/static/'
+                        encoded_drug = urllib.parse.quote(selected_drug)
+                        encoded_file = urllib.parse.quote(s['source'])
+                        # Ensure absolute path for cross-platform reliability
+                        pdf_url = f"/static/{encoded_drug}/{encoded_file}#page={s['page']}"
+                        
+                        pdf_link = f'<a href="{pdf_url}" target="_blank" class="source-link">📄 {s["source"]} (p.{s["page"]})</a>'
                         source_html += f"• {pdf_link}<br>"
                     source_html += "</div>"
                 
@@ -264,9 +308,17 @@ if selected == "Intelligence Chat":
                     cols = st.columns(len(sources))
                     for i, s in enumerate(sources):
                         file_path = os.path.abspath(os.path.join(RAW_DIR, selected_drug, s['source']))
-                        if cols[i].button(f"📖 Open {s['source'][:15]}... p.{s['page']}", key=f"src_{i}_{time.time()}"):
+                        encoded_drug = urllib.parse.quote(selected_drug)
+                        encoded_file = urllib.parse.quote(s['source'])
+                        pdf_url = f"/static/{encoded_drug}/{encoded_file}#page={s['page']}"
+                        
+                        if cols[i].button(f"🔍 Preview p.{s['page']}", key=f"pre_{i}_{time.time()}"):
+                            # Use an iframe for better cross-platform page jumping
+                            st.markdown(f'<iframe src="{pdf_url}" width="100%" height="800px" style="border-radius: 12px; border: 1px solid #e2e8f0;"></iframe>', unsafe_allow_html=True)
+                        
+                        if cols[i].button(f"📖 Open Native", key=f"src_{i}_{time.time()}"):
                             try:
-                                # Windows specific command to open file at specific page (if supported by default viewer)
+                                # Open in default local viewer
                                 os.startfile(file_path)
                                 st.toast(f"Opening {s['source']}...")
                             except Exception as e:
@@ -298,9 +350,16 @@ elif selected == "Data Management":
         if st.button("Submit Upload"):
             if files:
                 save_dir = os.path.join(RAW_DIR, target)
+                static_dir = os.path.join("static", target)
+                os.makedirs(static_dir, exist_ok=True)
                 for f in files:
+                    content = f.getbuffer()
+                    # Save to RAW
                     with open(os.path.join(save_dir, f.name), "wb") as out:
-                        out.write(f.getbuffer())
+                        out.write(content)
+                    # Save to STATIC for URL access
+                    with open(os.path.join(static_dir, f.name), "wb") as out:
+                        out.write(content)
                 st.success(f"{len(files)} files uploaded to {target}.")
     
     st.divider()
@@ -353,7 +412,13 @@ elif selected == "Cloud Processing":
         st.subheader("🧪 Step 3: Gemma Fine-tuning")
         st.write("**Unsloth** 라이브러리를 사용하여 고속 파인튜닝을 진행합니다.")
         st.info("Colab에서 아래 노트북을 열고 위에서 다운로드한 데이터를 학습시키세요.")
-        st.markdown("- [🚀 Gemma 2 2B/9B Fine-tuning (Unsloth)](https://colab.research.google.com/drive/1example_unsloth)")
+        st.markdown("- [🚀 Gemma 2 2B/9B Fine-tuning (Unsloth)](https://colab.research.google.com/github/unslothai/notebooks/blob/main/nb/Gemma_2_2b_it_bnb_4bit.ipynb)")
+        
+        with st.expander("📋 View Training Script Template"):
+            with open("scripts/colab_finetune_template.py", "r", encoding="utf-8") as f:
+                template_code = f.read()
+            st.code(template_code, language="python")
+            st.button("Copy to Clipboard (Simulated)", on_click=lambda: st.toast("Script copied! (Manual copy required in web)"))
         
     with col4:
         st.subheader("📥 Step 4: Local Ollama Sync")
@@ -458,13 +523,18 @@ elif selected == "Settings":
         st.write("**Vision VLM:** moondream / gemma4-vision")
         st.write(f"**QA Generator:** {selected_model}")
         
+        new_host = st.text_input("Ollama Host URL", value=st.session_state.ollama_host)
+        if new_host != st.session_state.ollama_host:
+            st.session_state.ollama_host = new_host
+            st.rerun()
+
         if st.button("Check Ollama Connection"):
             try:
-                client = ollama.Client(host='http://127.0.0.1:11434')
+                client = ollama.Client(host=st.session_state.ollama_host)
                 client.list()
-                st.success("Ollama is ONLINE")
+                st.success(f"Ollama is ONLINE ({st.session_state.ollama_host})")
             except:
-                st.error("Ollama is OFFLINE")
+                st.error(f"Ollama is OFFLINE ({st.session_state.ollama_host})")
                 
     with col2:
         st.subheader("🖥️ Hardware Info")
