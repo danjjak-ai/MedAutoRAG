@@ -310,10 +310,56 @@ elif selected == "Cloud Processing":
                 st.success("Results applied! Indexing bypassed as data is already processed.")
     
     st.divider()
-    st.subheader("🔗 Google Colab Links")
-    st.info("아래 링크를 클릭하여 준비된 Colab 노트북을 실행하세요.")
+    
+    col3, col4 = st.columns(2)
+    
+    with col3:
+        st.subheader("🧪 Step 3: Gemma Fine-tuning")
+        st.write("**Unsloth** 라이브러리를 사용하여 고속 파인튜닝을 진행합니다.")
+        st.info("Colab에서 아래 노트북을 열고 위에서 다운로드한 데이터를 학습시키세요.")
+        st.markdown("- [🚀 Gemma 2 2B/9B Fine-tuning (Unsloth)](https://colab.research.google.com/drive/1example_unsloth)")
+        
+    with col4:
+        st.subheader("📥 Step 4: Local Ollama Sync")
+        st.write("Colab에서 생성된 `.gguf` 파일을 업로드하여 로컬 Ollama에 즉시 등록합니다.")
+        uploaded_gguf = st.file_uploader("Upload Fine-tuned GGUF", type="gguf")
+        custom_model_name = st.text_input("New Model Name", value=f"gemma-specialized-{selected_drug.lower()}")
+        
+        if st.button("Register to Local Ollama"):
+            if uploaded_gguf:
+                with st.spinner("Ollama 모델 등록 중..."):
+                    # Save temporary GGUF
+                    temp_path = os.path.join("data", uploaded_gguf.name)
+                    with open(temp_path, "wb") as f:
+                        f.write(uploaded_gguf.getbuffer())
+                    
+                    # Create Modelfile
+                    modelfile_path = "Modelfile_temp"
+                    with open(modelfile_path, "w", encoding="utf-8") as f:
+                        f.write(f"FROM {temp_path}\n")
+                        f.write("PARAMETER stop <|im_start|>\n")
+                        f.write("PARAMETER stop <|im_end|>\n")
+                    
+                    try:
+                        # Register model
+                        res = subprocess.run(["ollama", "create", custom_model_name, "-f", modelfile_path], capture_output=True, text=True)
+                        if res.returncode == 0:
+                            st.success(f"Successfully registered `{custom_model_name}` to Ollama!")
+                        else:
+                            st.error(f"Error: {res.stderr}")
+                    except Exception as e:
+                        st.error(f"Exception: {str(e)}")
+                    finally:
+                        # Cleanup
+                        if os.path.exists(modelfile_path): os.remove(modelfile_path)
+            else:
+                st.warning("Please upload a GGUF file first.")
+
+    st.divider()
+    st.subheader("🔗 All Resources")
     st.markdown("- [🚀 MedAutoRAG - GPU Parser (VLM)](https://colab.research.google.com/drive/1example1)")
     st.markdown("- [🧪 MedAutoRAG - AutoRAG Optimizer](https://colab.research.google.com/drive/1example2)")
+    st.markdown("- [🧬 Gemma Specialized Training (New)](https://colab.research.google.com/drive/1example_unsloth)")
 
 elif selected == "Analytics Hub":
     st.title("📊 Pipeline Analytics")
