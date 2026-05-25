@@ -44,96 +44,240 @@ st.set_page_config(
 st.markdown("""
 <style>
     /* Google Fonts Import */
-    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Inter:wght@300;400;600&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;600;700&family=Inter:wght@300;400;600&display=swap');
     
     html, body, [class*="css"] {
-        font-family: 'Outfit', 'Inter', sans-serif;
+        font-family: 'Plus Jakarta Sans', 'Outfit', sans-serif;
+        color: #f1f5f9;
     }
 
     .stApp {
-        background: radial-gradient(circle at top right, #f8fafc, #eff6ff);
-        color: #1e293b;
+        background: radial-gradient(circle at 50% 50%, #0f172a 0%, #070a13 100%);
+        color: #f1f5f9;
     }
     
     /* Elegant Sidebar */
     section[data-testid="stSidebar"] {
-        background: rgba(255, 255, 255, 0.9) !important;
-        backdrop-filter: blur(10px);
-        border-right: 1px solid rgba(226, 232, 240, 0.5);
+        background: rgba(10, 15, 30, 0.7) !important;
+        backdrop-filter: blur(20px);
+        border-right: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    
+    section[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p {
+        color: #94a3b8;
+    }
+    
+    section[data-testid="stSidebar"] h1, section[data-testid="stSidebar"] h2, section[data-testid="stSidebar"] h3 {
+        color: #ffffff !important;
+    }
+    
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+        background: rgba(15, 23, 42, 0.5);
+    }
+    ::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.2);
     }
     
     /* High Visibility Professional Buttons */
     div[data-testid="stButton"] button {
-        background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
+        background: linear-gradient(135deg, #3b82f6, #06b6d4) !important;
         color: #ffffff !important;
-        border: none !important;
-        border-radius: 10px !important;
-        padding: 0.7rem 1.5rem !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-radius: 12px !important;
+        padding: 0.6rem 1.5rem !important;
         font-weight: 600 !important;
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2) !important;
     }
     div[data-testid="stButton"] button:hover {
-        transform: translateY(-3px) scale(1.02);
-        box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3) !important;
-        background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(6, 182, 212, 0.4) !important;
+        background: linear-gradient(135deg, #2563eb, #0891b2) !important;
+        border-color: rgba(255, 255, 255, 0.25) !important;
+    }
+    
+    /* Base input overrides (Selectbox, Text input, etc.) */
+    div[data-baseweb="select"] > div {
+        background-color: rgba(15, 23, 42, 0.6) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-radius: 10px !important;
+        color: #f1f5f9 !important;
+    }
+    div[data-baseweb="select"] [data-testid="stMarkdownContainer"] p {
+        color: #f1f5f9 !important;
+    }
+    div[data-baseweb="select"] svg {
+        fill: #94a3b8 !important;
+    }
+    div[data-baseweb="input"] input {
+        background-color: rgba(15, 23, 42, 0.6) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-radius: 10px !important;
+        color: #f1f5f9 !important;
+    }
+    div[data-testid="stFileUploader"] {
+        background-color: rgba(15, 23, 42, 0.4) !important;
+        border: 1px dashed rgba(255, 255, 255, 0.15) !important;
+        border-radius: 12px !important;
+        padding: 10px;
     }
     
     /* Metrics Styling */
     div[data-testid="metric-container"] {
-        background: white;
-        padding: 15px;
-        border-radius: 12px;
-        border: 1px solid #e2e8f0;
-        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        background: rgba(30, 41, 59, 0.35);
+        backdrop-filter: blur(10px);
+        padding: 20px;
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+    }
+    div[data-testid="metric-container"]:hover {
+        transform: translateY(-2px);
+        border-color: rgba(255, 255, 255, 0.15);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
     }
     div[data-testid="stMetricValue"] {
-        color: #1d4ed8 !important;
+        color: #06b6d4 !important;
         font-weight: 800 !important;
-        font-size: 1.8rem !important;
+        font-size: 2rem !important;
+        background: linear-gradient(135deg, #3b82f6, #06b6d4);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    div[data-testid="stMetricLabel"] {
+        color: #94a3b8 !important;
+        font-weight: 500 !important;
     }
 
     /* Chat Messages */
     .stChatMessage {
-        background: rgba(255, 255, 255, 0.8) !important;
-        backdrop-filter: blur(8px);
-        border: 1px solid rgba(226, 232, 240, 0.8) !important;
-        border-radius: 20px !important;
-        padding: 1.5rem !important;
-        box-shadow: 0 10px 15px -3px rgba(0,0,0,0.03) !important;
+        background: rgba(30, 41, 59, 0.25) !important;
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.05) !important;
+        border-radius: 16px !important;
+        padding: 1.2rem !important;
+        margin-bottom: 1rem !important;
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15) !important;
+        transition: border-color 0.3s ease;
+    }
+    .stChatMessage:hover {
+        border-color: rgba(255, 255, 255, 0.1) !important;
+    }
+    
+    /* Chat Input Styling */
+    div[data-testid="stChatInput"] {
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-radius: 16px !important;
+        background: rgba(15, 23, 42, 0.8) !important;
+        backdrop-filter: blur(12px) !important;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3) !important;
+    }
+    div[data-testid="stChatInput"] textarea {
+        color: #f1f5f9 !important;
     }
     
     .source-box {
-        background: linear-gradient(to right, #f1f5f9, #ffffff);
-        border-left: 5px solid #3b82f6;
+        background: linear-gradient(135deg, rgba(30, 41, 59, 0.5), rgba(15, 23, 42, 0.5));
+        border-left: 4px solid #06b6d4;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        border-right: 1px solid rgba(255, 255, 255, 0.05);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         padding: 15px;
         margin: 15px 0;
         font-size: 0.9rem;
-        border-radius: 8px;
-        box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
     }
     
     .source-link {
-        color: #2563eb;
+        color: #3b82f6;
         text-decoration: none;
         font-weight: 600;
-        padding: 2px 6px;
-        border-radius: 4px;
-        transition: all 0.2s;
+        padding: 3px 8px;
+        border-radius: 6px;
+        background: rgba(59, 130, 246, 0.1);
+        border: 1px solid rgba(59, 130, 246, 0.2);
+        transition: all 0.2s ease;
+        display: inline-block;
+        margin: 3px 0;
     }
     .source-link:hover {
-        background: #dbeafe;
-        color: #1e40af;
+        background: rgba(6, 182, 212, 0.2);
+        border-color: rgba(6, 182, 212, 0.4);
+        color: #06b6d4;
+        transform: translateY(-1px);
     }
 
     /* Custom Header */
     .main-header {
-        font-size: 2.5rem;
+        font-size: 2.8rem;
         font-weight: 800;
-        background: linear-gradient(90deg, #1e293b, #3b82f6);
+        background: linear-gradient(135deg, #ffffff 30%, #3b82f6 70%, #06b6d4 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         margin-bottom: 0.5rem;
+        letter-spacing: -0.05em;
+    }
+    
+    /* Toast message style override */
+    div[data-testid="stToast"] {
+        background-color: rgba(15, 23, 42, 0.9) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-radius: 12px !important;
+        color: #f1f5f9 !important;
+    }
+
+    /* Divider color */
+    hr {
+        border-color: rgba(255, 255, 255, 0.1) !important;
+    }
+    
+    /* Option menu styling override to prevent legacy white backgrounds */
+    ul.nav {
+        background-color: transparent !important;
+    }
+    .nav-item {
+        background-color: transparent !important;
+    }
+    .nav-link {
+        background-color: transparent !important;
+    }
+    .nav-link:hover {
+        background-color: rgba(6, 182, 212, 0.1) !important;
+        color: #06b6d4 !important;
+    }
+
+    /* Dropdown lists override (Selectbox portal) */
+    div[role="listbox"], ul[data-testid="stVirtualDropdown"] {
+        background-color: #0f172a !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-radius: 12px !important;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+    }
+    div[role="listbox"] li, ul[data-testid="stVirtualDropdown"] li {
+        color: #f1f5f9 !important;
+        background-color: transparent !important;
+        transition: all 0.2s ease !important;
+    }
+    div[role="listbox"] li:hover, div[role="listbox"] [aria-selected="true"],
+    ul[data-testid="stVirtualDropdown"] li:hover, ul[data-testid="stVirtualDropdown"] [aria-selected="true"] {
+        background-color: rgba(6, 182, 212, 0.15) !important;
+        color: #ffffff !important;
+    }
+    
+    /* Sidebar specific tweaks */
+    section[data-testid="stSidebar"] hr {
+        border-color: rgba(255, 255, 255, 0.08) !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -141,8 +285,8 @@ st.markdown("""
 # --- Sidebar Navigation ---
 with st.sidebar:
     st.markdown("<div style='text-align: center; padding: 20px 0;'><img src='https://img.icons8.com/nolan/128/medical-doctor.png' width='80'></div>", unsafe_allow_html=True)
-    st.markdown("<h1 style='text-align: center; font-size: 22px; color: #0f172a; margin-bottom: 5px;'>MedAutoRAG Elite</h1>", unsafe_allow_html=True)
-    st.markdown("<p style='text-align: center; font-size: 12px; color: #64748b;'>Next-Gen Medical Knowledge Base</p>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align: center; font-size: 22px; color: #ffffff; margin-bottom: 5px; font-weight: 700; letter-spacing: -0.03em;'>MedAutoRAG Elite</h1>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: center; font-size: 12px; color: #94a3b8; font-weight: 500;'>Next-Gen Medical Knowledge Base</p>", unsafe_allow_html=True)
     
     st.divider()
 
@@ -160,9 +304,9 @@ with st.sidebar:
         menu_icon="cast", default_index=0,
         styles={
             "container": {"background-color": "transparent", "padding": "0"},
-            "icon": {"color": "#3b82f6", "font-size": "16px"},
-            "nav-link": {"font-size": "14px", "color": "#475569", "text-align": "left", "margin":"5px 0", "font-weight": "500"},
-            "nav-link-selected": {"background-color": "#eff6ff", "color": "#1d4ed8", "border-radius": "8px"},
+            "icon": {"color": "#06b6d4", "font-size": "16px"},
+            "nav-link": {"font-size": "14px", "color": "#94a3b8", "text-align": "left", "margin": "5px 0", "font-weight": "500", "border-radius": "10px", "transition": "all 0.3s ease"},
+            "nav-link-selected": {"background-color": "rgba(6, 182, 212, 0.15)", "color": "#ffffff", "border": "1px solid rgba(6, 182, 212, 0.3)", "font-weight": "600"},
         }
     )
     
