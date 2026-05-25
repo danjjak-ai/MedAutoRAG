@@ -16,6 +16,9 @@ MedAutoRAG is a high-performance local medical knowledge base and RAG (Retrieval
 
 ## 📸 UI Gallery
 
+### MedAutoRAG Premium Dashboard (Dark Tech Theme)
+![MedAutoRAG Premium Dashboard](assets/screenshots/dashboard.png)
+
 ````carousel
 ![Intelligence Chat](assets/screenshots/chat.png)
 <!-- slide -->
